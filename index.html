@@ -1,442 +1,513 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ACB Chatbot</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #f0f4f8, #e2e8f0); display: flex; justify-content: center; padding: 20px; }
-        .main-container { width: 100%; max-width: 1000px; display: flex; gap: 20px; }
-        
-        /* Form Section */
-        .form-section { flex: 1; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .form-section h2 { color: #004080; margin-bottom: 20px; text-align: center; }
-        .form-field { margin-bottom: 15px; }
-        .form-field label { display: block; color: #333; font-weight: 600; margin-bottom: 5px; }
-        .form-field input, .form-field textarea { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px; transition: border-color 0.3s; }
-        .form-field input:focus, .form-field textarea:focus { outline: none; border-color: #004080; }
-        .form-field.active input, .form-field.active textarea { border-color: #ff6b6b; background: #fff5f5; }
-        
-        /* Controls */
-        .controls { display: flex; gap: 10px; margin: 20px 0; justify-content: center; }
-        .mic-btn { background: linear-gradient(135deg, #ff6b6b, #e74c3c); color: white; border: none; border-radius: 50%; width: 70px; height: 70px; font-size: 28px; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4); }
-        .mic-btn.listening { background: linear-gradient(135deg, #40c057, #2ecc71); animation: pulse 1.5s infinite; }
-        .btn { background: #004080; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 16px; cursor: pointer; transition: background 0.3s; }
-        .btn:hover { background: #0056b3; }
-        .btn.submit { background: #2ecc71; }
-        .btn.submit:hover { background: #27ae60; }
-        
-        /* Chat Section */
-        .chat-section { width: 400px; background: white; padding: 20px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
-        .chat-section h2 { color: #004080; margin-bottom: 20px; text-align: center; }
-        .chat-messages { flex: 1; overflow-y: auto; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 15px; height: 400px; }
-        .message { margin-bottom: 10px; padding: 10px; border-radius: 8px; animation: slideIn 0.3s; }
-        .message.user { background: #004080; color: white; margin-left: 30px; }
-        .message.bot { background: #e2e8f0; color: #333; margin-right: 30px; }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(46, 204, 113, 0); } }
-        
-        /* Language Selector */
-        .language-select { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
-        select { padding: 8px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 14px; }
-        
-        /* AI Features */
-        .ai-features { margin-top: 20px; background: #fff3cd; padding: 15px; border-radius: 8px; display: none; }
-        .ai-feature { margin: 10px 0; padding: 10px; background: white; border-radius: 8px; }
-        .feature-title { font-weight: bold; color: #856404; margin-bottom: 5px; }
-        
-        /* Progress */
-        .progress { text-align: center; margin-bottom: 15px; color: #004080; font-weight: bold; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ACB Chatbot</title>
+<style>
+audio {
+    margin-top: 10px;
+}
+
+.recording {
+    color: red;
+    font-weight: bold;
+}
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.chat-container {
+    width: 700px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    overflow: hidden;
+}
+
+.chat-header {
+    background: #004080;
+    color: white;
+    text-align: center;
+    padding: 15px;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.chat-body {
+    padding: 20px;
+}
+
+.bot-message {
+    background: #e8f0fe;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.option-btn {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    background: #004080;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.option-btn:hover {
+    background: #0066cc;
+}
+
+.form-container {
+    display: none;
+    margin-top: 20px;
+}
+
+.voice-assist-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.mic-btn {
+    background: linear-gradient(135deg, #ff6b6b, #e74c3c);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+}
+
+.mic-btn.listening {
+    background: linear-gradient(135deg, #40c057, #2ecc71);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); }
+    70% { box-shadow: 0 0 0 15px rgba(46, 204, 113, 0); }
+}
+
+.voice-progress {
+    flex: 1;
+    color: #004080;
+    font-weight: bold;
+}
+
+.form-field {
+    margin-bottom: 15px;
+    transition: all 0.3s;
+}
+
+.form-field.active {
+    transform: scale(1.02);
+}
+
+.form-field.active input,
+.form-field.active textarea {
+    border-color: #ff6b6b !important;
+    background: #fff5f5;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    margin-bottom: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+}
+
+input:focus, textarea:focus {
+    outline: none;
+    border-color: #004080;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 12px;
+    background: green;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.submit-btn:hover {
+    background: darkgreen;
+}
+
+.response {
+    margin-top: 15px;
+    padding: 15px;
+    background: #d4edda;
+    border-radius: 5px;
+    color: #155724;
+    font-weight: bold;
+}
+
+.district-container {
+    display: none;
+    margin-top: 20px;
+}
+
+.ai-features {
+    margin-top: 20px;
+    background: #fff3cd;
+    padding: 15px;
+    border-radius: 8px;
+    display: none;
+}
+
+.ai-feature {
+    margin: 10px 0;
+    padding: 10px;
+    background: white;
+    border-radius: 8px;
+}
+
+.feature-title {
+    font-weight: bold;
+    color: #856404;
+    margin-bottom: 5px;
+}
+
+.faq-chat {
+    display: none;
+    margin-top: 20px;
+}
+
+.chat-messages {
+    height: 300px;
+    overflow-y: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+.faq-msg {
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.faq-msg.user {
+    background: #004080;
+    color: white;
+    margin-left: 30px;
+}
+
+.faq-msg.bot {
+    background: #e8f0fe;
+    color: #333;
+    margin-right: 30px;
+}
+
+.faq-input {
+    display: flex;
+    gap: 10px;
+}
+
+.faq-input input {
+    flex: 1;
+    margin: 0;
+}
+
+h3 {
+    color: #004080;
+}
+</style>
+
 </head>
+
 <body>
-    <div class="main-container">
-        <!-- Form Section -->
-        <div class="form-section">
-            <h2>ACB Complaint Registration</h2>
-            
-            <div class="language-select">
-                <label>Language:</label>
-                <select id="languageSelect">
-                    <option value="en">English</option>
-                    <option value="ta">தமிழ்</option>
-                    <option value="te">తెలుగు</option>
-                    <option value="hi">हिंदी</option>
-                    <option value="mr">मराठी</option>
-                    <option value="gu">ગુજરાતી</option>
-                    <option value="kn">ಕನ್ನಡ</option>
-                    <option value="ml">മലയാളം</option>
-                    <option value="pa">ਪੰਜਾਬੀ</option>
-                    <option value="bn">বাংলা</option>
-                    <option value="as">অসমীয়া</option>
-                    <option value="or">ଓଡ଼ିଆ</option>
-                    <option value="ml">മലയാളം</option>
-                    <option value="ks">कॉशुर</option>
-                    <option value="si">සිංහල</option>
-                    <option value="ne">नेपाली</option>
-                    <option value="bo">བོད་སྐད་</option>
-                    <option value="sd">سنڌي</option>
-                    <option value="mai">मैथिली</option>
-                    <option value="mni">মেইতেই</option>
-                    <option value="doi">डोगरी</option>
-                    <option value="kok">कोंकणी</option>
-                    <option value="ur">اردو</option>
-                </select>
-            </div>
-            
-            <div class="progress" id="progressText">Click "Start Voice Assistant" to begin</div>
-            
-            <form id="complaintForm">
-                <div class="form-field" data-field="complainant_name">
-                    <label>1. Full Name *</label>
-                    <input type="text" id="name" placeholder="Enter your full name" required>
-                </div>
-                <div class="form-field" data-field="complainant_email">
-                    <label>2. Email</label>
-                    <input type="email" id="email" placeholder="Enter your email">
-                </div>
-                <div class="form-field" data-field="complainant_phone">
-                    <label>3. Phone Number</label>
-                    <input type="tel" id="phone" placeholder="Enter your phone number">
-                </div>
-                <div class="form-field" data-field="complainant_aadhar">
-                    <label>4. Aadhaar Number</label>
-                    <input type="text" id="aadhar" placeholder="Enter your 12-digit Aadhaar number">
-                </div>
-                <div class="form-field" data-field="complaint_details">
-                    <label>5. Complaint Details *</label>
-                    <textarea id="details" rows="5" placeholder="Describe your complaint in detail" required></textarea>
-                </div>
-                
-                <div class="controls">
-                    <button type="button" id="startVoiceBtn" class="mic-btn" title="Start Voice Assistant">🎤</button>
-                    <button type="button" id="resetBtn" class="btn">Reset</button>
-                    <button type="submit" class="btn submit">Submit Complaint</button>
-                </div>
-            </form>
-            
-            <div class="ai-features" id="aiFeatures">
-                <h3>AI Analysis</h3>
-                <div class="ai-feature">
-                    <div class="feature-title">📝 Summary</div>
-                    <div id="aiSummary">-</div>
-                </div>
-                <div class="ai-feature">
-                    <div class="feature-title">😊 Sentiment</div>
-                    <div id="aiSentiment">-</div>
-                </div>
-                <div class="ai-feature">
-                    <div class="feature-title">⭐ Priority</div>
-                    <div id="aiPriority">-</div>
-                </div>
-            </div>
+
+<div class="chat-container">
+
+<div class="chat-header">
+    ACB Chatbot
+</div>
+
+<div class="chat-body">
+
+    <div class="bot-message">
+        Hello, ACB is happy to help you deal with corruption related issues.
+        Please let us know the issue.
+    </div>
+
+    <button class="option-btn" onclick="showGrievanceForm()">
+        Want to register your grievance?
+    </button>
+
+    <button class="option-btn" onclick="showComplaintOptions()">
+        Want to know where to complain?
+    </button>
+
+    <button class="option-btn" onclick="showCustomerCare()">
+        Want to interact with ACB helpline?
+    </button>
+
+    <button class="option-btn" onclick="showFAQChat()">
+        Ask AI Assistant (FAQ)
+    </button>
+
+    <!-- GRIEVANCE FORM -->
+
+    <div class="form-container" id="grievanceForm">
+
+        <h3>Grievance Registration Form</h3>
+        <div style="margin-bottom: 15px;">
+            <label for="languageSelector" style="font-weight: bold; margin-right: 10px;">Preferred Language:</label>
+            <select id="languageSelector" onchange="updateLanguage()">
+                <option value="en">English</option>
+                <option value="hi">हिंदी (Hindi)</option>
+                <option value="te">తెలుగు (Telugu)</option>
+                <option value="ta">தமிழ் (Tamil)</option>
+                <option value="kn">ಕನ್ನಡ (Kannada)</option>
+                <option value="ml">മലയാളം (Malayalam)</option>
+                <option value="bn">বাংলা (Bengali)</option>
+                <option value="gu">ગુજરાતી (Gujarati)</option>
+                <option value="mr">मराठी (Marathi)</option>
+                <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
+                <option value="ur">اردو (Urdu)</option>
+            </select>
         </div>
-        
-        <!-- Chat Section -->
-        <div class="chat-section">
-            <h2>AI Assistant (Mithra)</h2>
-            <div class="chat-messages" id="chatMessages">
-                <div class="message bot">Hello! I'm Mithra, your ACB assistant. Click the 🎤 button to start voice-based form filling, or just type your complaint details!</div>
-            </div>
-            <div style="display: flex; gap: 10px;">
-                <input type="text" id="chatInput" style="flex: 1; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px;" placeholder="Type your message...">
-                <button id="sendChatBtn" class="btn">Send</button>
-            </div>
+        <div class="voice-assist-controls">
+            <button class="mic-btn" id="iterativeMicBtn" type="button" onclick="toggleIterativeVoice()">🎤</button>
+            <div class="voice-progress" id="voiceProgress">Click mic to start voice assistance</div>
+            <button class="option-btn" style="width:auto; padding:8px 16px;" onclick="resetVoiceProgress()">Reset</button>
+        </div>
+
+        <form id="complaintForm">
+
+           <!-- NAME -->
+<div class="form-field" data-field="name">
+    <input
+        type="text"
+        id="name"
+        placeholder="NAME*"
+        pattern="[A-Za-z ]+"
+        title="Name should contain only letters and spaces"
+        required
+    >
+</div>
+
+<div class="form-field" data-field="email">
+    <input
+        type="text"
+        id="email"
+        placeholder="EMAIL*"
+        required
+    >
+</div>
+
+<div class="form-field" data-field="AADHAR">
+    <input
+        type="text"
+        id="AADHAR"
+        placeholder="AADHAR NUMBER*"
+        pattern="[0-9]{12}"
+        maxlength="12"
+        title="AADHAR number must contain exactly 12 digits"
+        required
+    >
+</div>
+
+<div class="form-field" data-field="phone">
+    <input
+        type="tel"
+        id="phone"
+        placeholder="PHONE NUMBER*"
+        pattern="[0-9]{10}"
+        maxlength="10"
+        title="Phone number must contain exactly 10 digits"
+        required
+    >
+</div>
+
+<div class="form-field" data-field="address">
+    <textarea
+        id="address"
+        placeholder="ADDRESS*"
+        rows="2"
+        required
+    ></textarea>
+</div>
+
+<div class="form-field" data-field="officerName">
+    <input
+        type="text"
+        id="officerName"
+        placeholder="OFFICER UPON WHOM YOU WANT TO COMPLAIN*"
+        required
+    >
+</div>
+
+<div class="form-field" data-field="officerRank">
+    <input
+        type="text"
+        id="officerRank"
+        placeholder="RANK OF THE OFFICER*"
+        required
+    >
+</div>
+
+<div class="form-field" data-field="incidentDate">
+    <label>
+        Date on which s/he asked favour/money
+    </label>
+    <input
+        type="date"
+        id="incidentDate"
+        required
+    >
+</div>
+
+<div class="form-field" data-field="caseDetail">
+    <input
+        type="text"
+        id="caseDetail"
+        placeholder="CASE ON WHICH YOU VISITED THE OFFICE*"
+        required
+    >
+</div>
+
+<div class="form-field" data-field="issueDetail">
+    <label><b>Brief the issue in detail</b></label>
+    <textarea
+        id="issueDetail"
+        placeholder="Type the issue details here..."
+        rows="4"
+    ></textarea>
+</div>
+
+<br><br>
+
+<label><b>Or upload the written complaint</b></label>
+
+<input
+    type="file"
+    id="voiceFile"
+    accept="file/*"
+>
+<hr>
+
+<label><b>Voice Complaint Recording</b></label>
+
+<div style="margin:10px 0;">
+    <button type="button" id="startRecord" class="option-btn">
+        🎤 Start Recording
+    </button>
+
+    <button type="button" id="stopRecord" class="option-btn"
+        disabled
+        style="background:red;">
+        ⏹ Stop Recording
+    </button>
+</div>
+
+<p id="recordingStatus" style="color:#004080;font-weight:bold;">
+    No recording yet
+</p>
+
+<audio id="audioPlayback" controls style="width:100%;display:none;"></audio>
+
+<input type="hidden" id="voiceData">
+
+            <button
+                type="submit"
+                class="submit-btn">
+                Submit Complaint
+            </button>
+
+        </form>
+
+    </div>
+
+    <!-- AI FEATURES -->
+    <div class="ai-features" id="aiFeatures">
+        <h3>AI Analysis Results</h3>
+        <div class="ai-feature">
+            <div class="feature-title">📝 Complaint Summary</div>
+            <div id="aiSummary">Analyzing...</div>
+        </div>
+        <div class="ai-feature">
+            <div class="feature-title">😊 Sentiment Analysis</div>
+            <div id="aiSentiment">Analyzing...</div>
+        </div>
+        <div class="ai-feature">
+            <div class="feature-title">⭐ Priority Recommendation</div>
+            <div id="aiPriority">Analyzing...</div>
         </div>
     </div>
-    
-    <script>
-        const BACKEND = "http://localhost:8000";
-        let isRecording = false;
-        let mediaRecorder = null;
-        let audioChunks = [];
-        let currentStep = -1;
-        let complaintQuestionsAnswered = [];
-        
-        const complaintQuestions = [
-            { key: 'incident_date', label: 'Incident Date', prompt: 'When did the incident happen?', id: 'incident_date' },
-            { key: 'officer_name', label: 'Officer Name', prompt: 'Who is the officer involved?', id: 'officer_name' },
-            { key: 'officer_rank', label: 'Officer Rank', prompt: 'What is the officer\'s rank?', id: 'officer_rank' },
-            { key: 'amount', label: 'Bribe Amount', prompt: 'What is the amount of bribe (if any)?', id: 'amount' },
-            { key: 'witnesses', label: 'Witnesses', prompt: 'Are there any witnesses?', id: 'witnesses' }
-        ];
-        
-        const formFields = [
-            { id: 'name', key: 'complainant_name', label: 'Full Name', prompt: 'What is your full name?' },
-            { id: 'email', key: 'complainant_email', label: 'Email', prompt: 'What is your email address?' },
-            { id: 'phone', key: 'complainant_phone', label: 'Phone Number', prompt: 'What is your phone number?' },
-            { id: 'aadhar', key: 'complainant_aadhar', label: 'Aadhaar Number', prompt: 'What is your Aadhaar number?' },
-            { id: 'details', key: 'complaint_details', label: 'Complaint Details', prompt: 'Please describe your complaint in detail.' }
-        ];
-        
-        // Initialize
-        let voicesReady = false;
-        if ('speechSynthesis' in window) {
-            speechSynthesis.onvoiceschanged = () => { voicesReady = true; };
-        }
-        document.getElementById('startVoiceBtn').addEventListener('click', toggleVoice);
-        document.getElementById('resetBtn').addEventListener('click', resetForm);
-        document.getElementById('complaintForm').addEventListener('submit', handleSubmit);
-        document.getElementById('sendChatBtn').addEventListener('click', sendChatMessage);
-        document.getElementById('chatInput').addEventListener('keypress', e => { if (e.key === 'Enter') sendChatMessage(); });
-        
-        function addChatMessage(text, sender) {
-            const div = document.createElement('div');
-            div.className = `message ${sender}`;
-            div.textContent = text;
-            document.getElementById('chatMessages').appendChild(div);
-            document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
-        }
-        
-        function updateProgress() {
-            if (currentStep < 0) {
-                document.getElementById('progressText').textContent = 'Click "Start Voice Assistant" to begin';
-            } else if (currentStep < formFields.length) {
-                document.getElementById('progressText').textContent = `Step ${currentStep + 1}/${formFields.length}: ${formFields[currentStep].label}`;
-            } else if (currentStep < formFields.length + complaintQuestions.length) {
-                document.getElementById('progressText').textContent = `Additional Details: ${complaintQuestions[currentStep - formFields.length].label}`;
-            } else {
-                document.getElementById('progressText').textContent = 'All fields filled! Please review and submit.';
-            }
-            
-            // Highlight active field
-            document.querySelectorAll('.form-field').forEach(el => el.classList.remove('active'));
-            if (currentStep >= 0 && currentStep < formFields.length) {
-                const field = document.querySelector(`.form-field[data-field="${formFields[currentStep].key}"]`;
-                if (field) field.classList.add('active');
-            }
-        }
-        
-        async function toggleVoice() {
-            if (isRecording) {
-                stopRecording();
-            } else {
-                if (currentStep < 0) {
-                    currentStep = 0;
-                    updateProgress();
-                    addChatMessage(formFields[0].prompt, 'bot');
-                    speak(formFields[0].prompt);
-                }
-                await startRecording();
-            }
-        }
-        
-        async function startRecording() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream);
-                audioChunks = [];
-                
-                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-                mediaRecorder.onstop = handleRecordingStop;
-                
-                mediaRecorder.start();
-                isRecording = true;
-                document.getElementById('startVoiceBtn').classList.add('listening');
-            } catch (e) {
-                console.error(e);
-                addChatMessage('Error: Unable to access microphone!', 'bot');
-            }
-        }
-        
-        function stopRecording() {
-            if (mediaRecorder && mediaRecorder.state === 'recording') {
-                mediaRecorder.stop();
-            }
-            isRecording = false;
-            document.getElementById('startVoiceBtn').classList.remove('listening');
-        }
-        
-        async function handleRecordingStop() {
-            const blob = new Blob(audioChunks, { type: 'audio/webm' });
-            const formData = new FormData();
-            formData.append('file', blob, 'recording.webm');
-            
-            try {
-                const sttRes = await fetch(`${BACKEND}/api/stt`, { method: 'POST', body: formData });
-                const sttData = await sttRes.json();
-                const text = sttData.text || '';
-                
-                if (text) {
-                    addChatMessage(text, 'user');
-                    await handleTextInput(text);
-                } else {
-                    addChatMessage('Sorry, I could not understand that. Please try again.', 'bot');
-                }
-            } catch (e) {
-                console.error(e);
-                addChatMessage('Error transcribing audio. Please try again.', 'bot');
-            }
-        }
-        
-        async function handleTextInput(text) {
-            if (currentStep >= 0 && currentStep < formFields.length) {
-                const field = formFields[currentStep];
-                document.getElementById(field.id).value = text;
-                
-                currentStep++;
-                updateProgress();
-                
-                if (currentStep < formFields.length) {
-                    addChatMessage(formFields[currentStep].prompt, 'bot');
-                    speak(formFields[currentStep].prompt);
-                } else {
-                    addChatMessage('Thank you! Now, let me ask you some important details about the complaint.', 'bot');
-                    speak('Thank you! Now, let me ask you some important details about the complaint.');
-                    setTimeout(() => {
-                        addChatMessage(complaintQuestions[0].prompt, 'bot');
-                        speak(complaintQuestions[0].prompt);
-                    }, 2000);
-                }
-            } else if (currentStep >= formFields.length && currentStep < formFields.length + complaintQuestions.length) {
-                const qIdx = currentStep - formFields.length;
-                const q = complaintQuestions[qIdx];
-                complaintQuestionsAnswered.push({ key: q.key, value: text });
-                
-                currentStep++;
-                updateProgress();
-                
-                if (currentStep < formFields.length + complaintQuestions.length) {
-                    const nextQ = complaintQuestions[currentStep - formFields.length];
-                    addChatMessage(nextQ.prompt, 'bot');
-                    speak(nextQ.prompt);
-                } else {
-                    addChatMessage('Great! All details are collected. Please review and submit!', 'bot');
-                    speak('Great! All details are collected. Please review and submit!');
-                }
-            } else {
-                await sendToBackend(text);
-            }
-        }
-        
-        async function sendChatMessage() {
-            const input = document.getElementById('chatInput');
-            const text = input.value.trim();
-            if (!text) return;
-            
-            addChatMessage(text, 'user');
-            input.value = '';
-            await handleTextInput(text);
-        }
-        
-        async function sendToBackend(text) {
-            try {
-                const res = await fetch(`${BACKEND}/api/chat`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: text })
-                });
-                const data = await res.json();
-                addChatMessage(data.response, 'bot');
-                speak(data.response);
-            } catch (e) {
-                addChatMessage('Sorry, I could not process that request.', 'bot');
-            }
-        }
-        
-        async function handleSubmit(e) {
-            e.preventDefault();
-            
-            const formData = {
-                complainant_name: document.getElementById('name').value,
-                complainant_email: document.getElementById('email').value,
-                complainant_phone: document.getElementById('phone').value,
-                complainant_aadhar: document.getElementById('aadhar').value,
-                complaint_details: document.getElementById('details').value,
-                additional_details: JSON.stringify(complaintQuestionsAnswered)
-            };
-            
-            // Analyze
-            try {
-                const analyzeRes = await fetch(`${BACKEND}/api/analyze`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(formData)
-                });
-                const analysis = await analyzeRes.json();
-                
-                document.getElementById('aiFeatures').style.display = 'block';
-                document.getElementById('aiSummary').textContent = analysis.summary;
-                document.getElementById('aiSentiment').textContent = `${analysis.sentiment} (${analysis.confidence}%)`;
-                document.getElementById('aiPriority').textContent = analysis.priority;
-                
-                // Submit
-                const submitRes = await fetch(`${BACKEND}/api/complaints/`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(formData)
-                });
-                const submitData = await submitRes.json();
-                
-                addChatMessage(`Complaint submitted successfully! Your Complaint ID is ${submitData.complaint_id}`, 'bot');
-                alert(`Complaint submitted successfully! Complaint ID: ${submitData.complaint_id}`);
-            } catch (e) {
-                console.error(e);
-                addChatMessage('Error submitting complaint. Please try again.', 'bot');
-            }
-        }
-        
-        function resetForm() {
-            currentStep = -1;
-            complaintQuestionsAnswered = [];
-            document.getElementById('complaintForm').reset();
-            updateProgress();
-            document.getElementById('aiFeatures').style.display = 'none';
-        }
-        
-        function speak(text) {
-            if ('speechSynthesis' in window) {
-                speechSynthesis.cancel();
-                
-                const langSelect = document.getElementById('languageSelect');
-                const lang = langSelect.value === 'en' ? 'en-IN' : langSelect.value + '-' + langSelect.value.toUpperCase();
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = lang;
-                utterance.rate = 0.9;
-                utterance.pitch = 1.2;
-                
-                // Load voices
-                const loadVoices = () => {
-                    const voices = speechSynthesis.getVoices();
-                    let femaleVoice = null;
-                    
-                    for (const voice of voices) {
-                        const vLower = voice.name.toLowerCase();
-                        if (voice.lang.includes('IN') || voice.lang.includes('India')) {
-                            if (vLower.includes('female') || vLower.includes('google') || vLower.includes('mithra')) {
-                                femaleVoice = voice;
-                                break;
-                            }
-                        }
-                    }
-                    
-                    if (!femaleVoice) {
-                        for (const voice of voices) {
-                            const vLower = voice.name.toLowerCase();
-                            if (vLower.includes('female')) {
-                                femaleVoice = voice;
-                                break;
-                            }
-                        }
-                    }
-                    
-                    if (femaleVoice) {
-                        utterance.voice = femaleVoice;
-                    }
-                    
-                    speechSynthesis.speak(utterance);
-                };
-                
-                if (speechSynthesis.getVoices().length === 0) {
-                    speechSynthesis.onvoiceschanged = () => {
-                        loadVoices();
-                    };
-                } else {
-                    loadVoices();
-                }
-            }
-        }
-    </script>
+
+    <!-- DISTRICT SELECTION -->
+
+    <div class="district-container" id="districtSection">
+
+        <h3>Where did the incident of corruption occur?</h3>
+
+        <button class="option-btn" onclick="showDistrictResponse('Srikakulam')">Srikakulam</button>
+
+        <button class="option-btn" onclick="showDistrictResponse('Vizianagaram')">Vizianagaram</button>
+
+        <button class="option-btn" onclick="showDistrictResponse('Visakhapatnam')">Visakhapatnam</button>
+
+        <button class="option-btn" onclick="showDistrictResponse('East Godavari')">East Godavari</button>
+
+        <button class="option-btn" onclick="showDistrictResponse('West Godavari')">West Godavari</button>
+
+        <button class="option-btn" onclick="showDistrictResponse('Krishna')">Krishna</button>
+
+        <button class="option-btn" onclick="showDistrictResponse('Guntur')">Guntur</button>
+
+        <button class="option-btn" onclick="showDistrictResponse('Ongole')">Ongole</button>
+
+        <button class="option-btn" onclick="showDistrictResponse('Nellore')">Nellore</button>
+
+        <button class="option-btn" onclick="showDistrictResponse('Kurnool')">Kurnool</button>
+
+        <button class="option-btn" onclick="showDistrictResponse('Kadapa')">Kadapa</button>
+
+        <button class="option-btn" onclick="showDistrictResponse('Tirupati')">Tirupati</button>
+
+        <button class="option-btn" onclick="showDistrictResponse('Ananthapuram')">Ananthapuram</button>
+
+    </div>
+
+    <!-- FAQ CHAT -->
+    <div class="faq-chat" id="faqChat">
+        <h3>AI FAQ Assistant</h3>
+        <div class="chat-messages" id="faqMessages">
+            <div class="faq-msg bot">Hello! Ask me anything about ACB, complaints, or procedures!</div>
+        </div>
+        <div class="faq-input">
+            <input type="text" id="faqInput" placeholder="Ask your question...">
+            <button onclick="sendFAQMessage()">Send</button>
+        </div>
+    </div>
+
+    <div id="responseArea"></div>
+
+</div>
+
+</div>
+
+<script src="chatbot.js"></script>
 </body>
 </html>

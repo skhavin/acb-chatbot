@@ -421,7 +421,7 @@ Case detail: {request.case_detail}
     }
 
 @app.post("/api/stt")
-async def speech_to_text(file: UploadFile = File(...)):
+async def speech_to_text(file: UploadFile = File(...), language: str = "en"):
     file_location = f"uploads/{file.filename}"
     with open(file_location, "wb") as f:
         f.write(await file.read())
@@ -431,9 +431,9 @@ async def speech_to_text(file: UploadFile = File(...)):
             import whisperx
             device = "cuda" if torch.cuda.is_available() else "cpu"
             
-            # Transcribe
+            # Transcribe with specified language
             audio = whisperx.load_audio(file_location)
-            result = whisperx_model.transcribe(audio, batch_size=16)
+            result = whisperx_model.transcribe(audio, batch_size=16, language=language)
             
             # Combine all segments
             full_text = " ".join([segment["text"].strip() for segment in result["segments"]])
