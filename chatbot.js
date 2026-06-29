@@ -276,6 +276,74 @@ function initializeFieldListeners() {
             }
         });
     }
+
+    const complaintForm = document.getElementById('complaintForm');
+    if (complaintForm) {
+        complaintForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await submitComplaint();
+        });
+    }
+}
+
+async function submitComplaint() {
+    try {
+        const formData = {
+            complainant_name: document.getElementById('name').value,
+            complainant_email: document.getElementById('email').value,
+            complainant_phone: document.getElementById('phone').value,
+            complainant_aadhar: document.getElementById('AADHAR').value,
+            complaint_details: document.getElementById('issueDetail').value,
+            address: document.getElementById('address').value,
+            officer_name: document.getElementById('officerName').value,
+            officer_rank: document.getElementById('officerRank').value,
+            incident_date: document.getElementById('incidentDate').value,
+            case_detail: document.getElementById('caseDetail').value
+        };
+
+        const response = await fetch(`${BACKEND_URL}/api/complaints/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            const complaintId = result.complaint_id;
+            
+            // Show success message with complaint ID
+            const responseArea = document.getElementById('responseArea');
+            responseArea.innerHTML = `
+                <div class="response" style="background: #d4edda; color: #155724; padding: 20px; border-radius: 8px; text-align: center; font-size: 18px;">
+                    <h2 style="margin: 0 0 10px 0;">✅ Complaint Registered Successfully!</h2>
+                    <p style="font-size: 24px; font-weight: bold; color: #004080; margin: 10px 0;">
+                        Your Complaint ID: <span style="font-size: 32px; color: #ff6b6b;">#${complaintId}</span>
+                    </p>
+                    <p style="margin: 10px 0;">Please save this ID for future reference!</p>
+                </div>
+            `;
+            
+            // Speak the success message
+            await speak(`Complaint registered successfully! Your complaint ID is ${complaintId}. Please save this ID for future reference.`);
+            
+            // Reset the form
+            document.getElementById('complaintForm').reset();
+        } else {
+            throw new Error('Failed to submit complaint');
+        }
+    } catch (error) {
+        console.error('Error submitting complaint:', error);
+        const responseArea = document.getElementById('responseArea');
+        responseArea.innerHTML = `
+            <div class="response" style="background: #f8d7da; color: #721c24; padding: 20px; border-radius: 8px; text-align: center;">
+                <h2>❌ Error Submitting Complaint</h2>
+                <p>Please try again later.</p>
+            </div>
+        `;
+        await speak('Sorry, there was an error submitting your complaint. Please try again later.');
+    }
 }
 
 function stopIssueStream() {
