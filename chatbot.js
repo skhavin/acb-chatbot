@@ -266,6 +266,16 @@ function initializeFieldListeners() {
     if (issueMicBtn) {
         issueMicBtn.addEventListener('click', toggleIssueRecording);
     }
+
+    const faqInput = document.getElementById('faqInput');
+    if (faqInput) {
+        faqInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendFAQMessage();
+            }
+        });
+    }
 }
 
 function stopIssueStream() {
@@ -352,3 +362,59 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 });
+
+function sendFAQMessage() {
+    const input = document.getElementById('faqInput');
+    const messagesDiv = document.getElementById('faqMessages');
+    const text = input.value.trim();
+    if (!text) return;
+
+    // Add user message
+    const userMsg = document.createElement('div');
+    userMsg.className = 'faq-msg user';
+    userMsg.textContent = text;
+    messagesDiv.appendChild(userMsg);
+    input.value = '';
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+    // Check if it's a complaint status request
+    const complaintIdMatch = text.match(/\d{5,}/);
+    if (complaintIdMatch) {
+        checkComplaintStatus(complaintIdMatch[0], messagesDiv);
+        return;
+    }
+
+    // Default bot response
+    const botMsg = document.createElement('div');
+    botMsg.className = 'faq-msg bot';
+    botMsg.textContent = "I can help you check your complaint status! Just mention your complaint ID (e.g., 'What is the status of complaint 12345?').";
+    messagesDiv.appendChild(botMsg);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+async function checkComplaintStatus(complaintId, messagesDiv) {
+    try {
+        const response = await fetch(`${BACKEND_URL}/api/complaints/${complaintId}`);
+        if (response.ok) {
+            const complaint = await response.json();
+            const botMsg = document.createElement('div');
+            botMsg.className = 'faq-msg bot';
+            botMsg.textContent = `Complaint #${complaint.id}:\nStatus: ${complaint.status}\nRegistered on: ${complaint.complaint_date}\nComplainant: ${complaint.complainant_name}`;
+            messagesDiv.appendChild(botMsg);
+            await speak(`Complaint status: ${complaint.status}. Registered on ${complaint.complaint_date}.`);
+        } else {
+            const botMsg = document.createElement('div');
+            botMsg.className = 'faq-msg bot';
+            botMsg.textContent = "Complaint not found! Please check the ID.";
+            messagesDiv.appendChild(botMsg);
+            await speak("Complaint not found! Please check the ID.");
+        }
+    } catch (error) {
+        console.error("Error checking complaint status:", error);
+        const botMsg = document.createElement('div');
+        botMsg.className = 'faq-msg bot';
+        botMsg.textContent = "Sorry, I couldn't check the complaint status right now.";
+        messagesDiv.appendChild(botMsg);
+    }
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
