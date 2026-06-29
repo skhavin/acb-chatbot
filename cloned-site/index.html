@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ACB Chatbot</title>
+<link rel="stylesheet" href="chatbot.css">
+</head>
+<body>
+<div class="chat-container">
+<div class="chat-header">ACB Chatbot</div>
+<div class="chat-body">
+<div class="bot-message">
+Hello, ACB is happy to help you deal with corruption related issues. Please let us know the issue.
+</div>
+<button class="option-btn" onclick="showGrievanceForm()">Want to register your grievance?</button>
+<button class="option-btn" onclick="showComplaintOptions()">Want to know where to complain?</button>
+<button class="option-btn" onclick="showCustomerCare()">Want to interact with ACB helpline?</button>
+<button class="option-btn" onclick="showFAQChat()">Ask AI Assistant (FAQ)</button>
+
+<!-- GRIEVANCE FORM -->
+<div class="form-container" id="grievanceForm">
+<h3>Grievance Registration Form</h3>
+<div class="voice-assist-controls">
+<button class="mic-btn" id="iterativeMicBtn" type="button" onclick="toggleIterativeVoice()">🎤</button>
+<div class="voice-progress" id="voiceProgress">Click mic to start voice assistance</div>
+<button class="option-btn" style="width:auto; padding:8px 16px;" onclick="resetVoiceProgress()">Reset</button>
+</div>
+<form id="complaintForm">
+<div class="form-field" data-field="name">
+<input type="text" id="name" placeholder="NAME*" pattern="[A-Za-z ]+" title="Name should contain only letters and spaces" required>
+</div>
+<div class="form-field" data-field="email">
+<input type="text" id="email" placeholder="EMAIL*" required>
+</div>
+<div class="form-field" data-field="AADHAR">
+<input type="text" id="AADHAR" placeholder="AADHAR NUMBER*" pattern="[0-9]{12}" maxlength="12" title="AADHAR number must contain exactly 12 digits" required>
+</div>
+<div class="form-field" data-field="phone">
+<input type="tel" id="phone" placeholder="PHONE NUMBER*" pattern="[0-9]{10}" maxlength="10" title="Phone number must contain exactly 10 digits" required>
+</div>
+<div class="form-field" data-field="address">
+<textarea id="address" placeholder="ADDRESS*" rows="2" required></textarea>
+</div>
+<div class="form-field" data-field="officerName">
+<input type="text" id="officerName" placeholder="OFFICER UPON WHOM YOU WANT TO COMPLAIN*" required>
+</div>
+<div class="form-field" data-field="officerRank">
+<input type="text" id="officerRank" placeholder="RANK OF THE OFFICER*" required>
+</div>
+<div class="form-field" data-field="incidentDate">
+<label>Date on which s/he asked favour/money</label>
+<input type="date" id="incidentDate" required>
+</div>
+<div class="form-field" data-field="caseDetail">
+<input type="text" id="caseDetail" placeholder="CASE ON WHICH YOU VISITED THE OFFICE*" required>
+</div>
+<div class="form-field" data-field="issueDetail">
+<label><b>Brief the issue in detail</b></label>
+<textarea id="issueDetail" placeholder="Type the issue details here..." rows="4"></textarea>
+</div>
+<label><b>Or upload the written complaint</b></label>
+<input type="file" id="voiceFile" accept="file/*">
+<hr>
+<label><b>Voice Complaint Recording</b></label>
+<div style="margin:10px 0;">
+<button type="button" id="startRecord" class="option-btn">🎤 Start Recording</button>
+<button type="button" id="stopRecord" class="option-btn" disabled style="background:red;">⏹ Stop Recording</button>
+</div>
+<p id="recordingStatus" style="color:#004080;font-weight:bold;">No recording yet</p>
+<audio id="audioPlayback" controls style="width:100%;display:none;"></audio>
+<input type="hidden" id="voiceData">
+<button type="submit" class="submit-btn">Submit Complaint</button>
+</form>
+</div>
+
+<!-- AI FEATURES -->
+<div class="ai-features" id="aiFeatures">
+<h3>AI Analysis Results</h3>
+<div class="ai-feature">
+<div class="feature-title">📝 Complaint Summary</div>
+<div id="aiSummary">Analyzing...</div>
+</div>
+<div class="ai-feature">
+<div class="feature-title">😊 Sentiment Analysis</div>
+<div id="aiSentiment">Analyzing...</div>
+</div>
+<div class="ai-feature">
+<div class="feature-title">⭐ Priority Recommendation</div>
+<div id="aiPriority">Analyzing...</div>
+</div>
+</div>
+
+<!-- DISTRICT SELECTION -->
+<div class="district-container" id="districtSection">
+<h3>Where did the incident of corruption occur?</h3>
+<button class="option-btn" onclick="showDistrictResponse('Srikakulam')">Srikakulam</button>
+<button class="option-btn" onclick="showDistrictResponse('Vizianagaram')">Vizianagaram</button>
+<button class="option-btn" onclick="showDistrictResponse('Visakhapatnam')">Visakhapatnam</button>
+<button class="option-btn" onclick="showDistrictResponse('East Godavari')">East Godavari</button>
+<button class="option-btn" onclick="showDistrictResponse('West Godavari')">West Godavari</button>
+<button class="option-btn" onclick="showDistrictResponse('Krishna')">Krishna</button>
+<button class="option-btn" onclick="showDistrictResponse('Guntur')">Guntur</button>
+<button class="option-btn" onclick="showDistrictResponse('Ongole')">Ongole</button>
+<button class="option-btn" onclick="showDistrictResponse('Nellore')">Nellore</button>
+<button class="option-btn" onclick="showDistrictResponse('Kurnool')">Kurnool</button>
+<button class="option-btn" onclick="showDistrictResponse('Kadapa')">Kadapa</button>
+<button class="option-btn" onclick="showDistrictResponse('Tirupati')">Tirupati</button>
+<button class="option-btn" onclick="showDistrictResponse('Ananthapuram')">Ananthapuram</button>
+</div>
+
+<!-- FAQ CHAT -->
+<div class="faq-chat" id="faqChat">
+<h3>AI FAQ Assistant</h3>
+<div class="chat-messages" id="faqMessages">
+<div class="faq-msg bot">Hello! Ask me anything about ACB, complaints, or procedures!</div>
+</div>
+<div class="faq-input">
+<input type="text" id="faqInput" placeholder="Ask your question...">
+<button onclick="sendFAQMessage()">Send</button>
+</div>
+</div>
+
+<div id="responseArea"></div>
+</div>
+</div>
+
+<script src="chatbot.js"></script>
+</body>
+</html>

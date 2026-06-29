@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ACB Chatbot</title>
+
+<style>
+audio {
+    margin-top: 10px;
+}
+
+.recording {
+    color: red;
+    font-weight: bold;
+}
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.chat-container {
+    width: 700px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    overflow: hidden;
+}
+
+.chat-header {
+    background: #004080;
+    color: white;
+    text-align: center;
+    padding: 15px;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.chat-body {
+    padding: 20px;
+}
+
+.bot-message {
+    background: #e8f0fe;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.option-btn {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    background: #004080;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.option-btn:hover {
+    background: #0066cc;
+}
+
+.form-container {
+    display: none;
+    margin-top: 20px;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    margin-bottom: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 12px;
+    background: green;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.submit-btn:hover {
+    background: darkgreen;
+}
+
+.response {
+    margin-top: 15px;
+    padding: 15px;
+    background: #d4edda;
+    border-radius: 5px;
+    color: #155724;
+    font-weight: bold;
+}
+
+.district-container {
+    display: none;
+    margin-top: 20px;
+}
+
+h3 {
+    color: #004080;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="chat-container">
+
+```
+<div class="chat-header">
+    ACB Chatbot
+</div>
+
+<div class="chat-body">
+
+    <div class="bot-message">
+        Hello, ACB is happy to help you deal with corruption related issues.
+        Please let us know the issue.
+    </div>
+
+    <button class="option-btn" onclick="showGrievanceForm()">
+        Want to register your grievance?
+    </button>
+
+    <button class="option-btn" onclick="showComplaintOptions()">
+        Want to know where to complain?
+    </button>
+
+    <button class="option-btn" onclick="showCustomerCare()">
+        Want to interact with ACB helpline?
+    </button>
+
+    <!-- GRIEVANCE FORM -->
+
+    <div class="form-container" id="grievanceForm">
+
+        <h3>Grievance Registration Form</h3>
+
+        <form id="complaintForm">
+
+           <!-- NAME -->
+<input
+    type="text"
+    id="name"
+    placeholder="NAME*"
+    pattern="[A-Za-z ]+"
+    title="Name should contain only letters and spaces"
+    required
+>
+
+<!-- AADHAR NUMBER -->
+<input
+    type="text"
+    id="AADHAR"
+    placeholder="AADHAR NUMBER*"
+    pattern="[0-9]{12}"
+    maxlength="12"
+    title="AADHAR number must contain exactly 12 digits"
+    required
+>
+
+<!-- PHONE NUMBER -->
+<input
+    type="tel"
+    id="phone"
+    placeholder="PHONE NUMBER*"
+    pattern="[0-9]{10}"
+    maxlength="10"
+    title="Phone number must contain exactly 10 digits"
+    required
+>
+
+            <textarea
+                placeholder="ADDRESS*"
+                required
+            ></textarea>
+
+            <input
+                type="text"
+                placeholder="OFFICER UPON WHOM YOU WANT TO COMPLAIN*"
+                required
+            >
+
+            <input
+                type="text"
+                placeholder="RANK OF THE OFFICER*"
+                required
+            >
+
+            <label>
+                Date on which s/he asked favour/money
+            </label>
+
+            <input
+                type="date"
+                required
+            >
+
+            <input
+                type="text"
+                placeholder="CASE ON WHICH YOU VISITED THE OFFICE*"
+                required
+            >
+          
+<label><b>Brief the issue in detail</b></label>
+
+<textarea
+    id="issueDetail"
+    placeholder="Type the issue details here..."
+    rows="4"
+></textarea>
+
+<br><br>
+
+<label><b>Or upload the written complaint</b></label>
+
+<input
+    type="file"
+    id="voiceFile"
+    accept="file/*"
+>
+<hr>
+
+<label><b>Voice Complaint Recording</b></label>
+
+<div style="margin:10px 0;">
+    <button type="button" id="startRecord" class="option-btn">
+        🎤 Start Recording
+    </button>
+
+    <button type="button" id="stopRecord" class="option-btn"
+        disabled
+        style="background:red;">
+        ⏹ Stop Recording
+    </button>
+</div>
+
+<p id="recordingStatus" style="color:#004080;font-weight:bold;">
+    No recording yet
+</p>
+
+<audio id="audioPlayback" controls style="width:100%;display:none;"></audio>
+
+<input type="hidden" id="voiceData">
+
+            <button
+                type="submit"
+                class="submit-btn">
+                Submit Complaint
+            </button>
+
+        </form>
+
+    </div>
+
+    <!-- DISTRICT SELECTION -->
+
+    <div class="district-container" id="districtSection">
+
+        <h3>Where did the incident of corruption occur?</h3>
+
+        <button class="option-btn" onclick="showDistrictResponse('Srikakulam')">Srikakulam</button>
+
+        <button class="option-btn" onclick="showDistrictResponse('Vizianagaram')">Vizianagaram</button>
+
+        <button class="option-btn" onclick="showDistrictResponse('Visakhapatnam')">Visakhapatnam</button>
+
+        <button class="option-btn" onclick="showDistrictResponse('East Godavari')">East Godavari</button>
+
+        <button class="option-btn" onclick="showDistrictResponse('West Godavari')">West Godavari</button>
+
+        <button class="option-btn" onclick="showDistrictResponse('Krishna')">Krishna</button>
+
+        <button class="option-btn" onclick="showDistrictResponse('Guntur')">Guntur</button>
+
+        <button class="option-btn" onclick="showDistrictResponse('Ongole')">Ongole</button>
+
+        <button class="option-btn" onclick="showDistrictResponse('Nellore')">Nellore</button>
+
+        <button class="option-btn" onclick="showDistrictResponse('Kurnool')">Kurnool</button>
+
+        <button class="option-btn" onclick="showDistrictResponse('Kadapa')">Kadapa</button>
+
+        <button class="option-btn" onclick="showDistrictResponse('Tirupati')">Tirupati</button>
+
+        <button class="option-btn" onclick="showDistrictResponse('Ananthapuram')">Ananthapuram</button>
+
+    </div>
+
+    <div id="responseArea"></div>
+
+</div>
+```
+
+</div>
+
+<script>
+
+function hideSections() {
+
+    document.getElementById("grievanceForm").style.display = "none";
+    document.getElementById("districtSection").style.display = "none";
+}
+
+function showGrievanceForm() {
+
+    hideSections();
+
+    document.getElementById("responseArea").innerHTML = "";
+
+    document.getElementById("grievanceForm").style.display = "block";
+}
+
+function showComplaintOptions() {
+
+    hideSections();
+
+    document.getElementById("responseArea").innerHTML = "";
+
+    document.getElementById("districtSection").style.display = "block";
+}
+
+function showCustomerCare() {
+
+    hideSections();
+
+    document.getElementById("responseArea").innerHTML =
+    `
+    <div class="response" style="text-align:center; font-size:22px;">
+        <b>DIAL 1064</b>
+    </div>
+    `;
+}
+
+function showCustomerCare() {
+
+    hideSections();
+
+    document.getElementById("responseArea").innerHTML =
+    `
+    <div class="response" style="text-align:center; font-size:22px;">
+        <b>DIAL <a href="tel:1064">1064</a></b>
+    </div>
+    `;
+}
+
+function showDistrictResponse(district) {
+
+    let response = "";
+
+    if(district === "Srikakulam") {
+
+    response = `
+    <div class="response">
+        <h3>Srikakulam ACB Office</h3>
+
+        <p>
+            Please visit the ACB Office location using Google Maps.
+        </p>
+
+        <a
+            href="https://www.google.com/maps/dir//Anti+Corruption+Bureau+ACB+office,+8V9W%2B543,+Bondilipuram,+Balaga,+Srikakulam,+Andhra+Pradesh+532001/@16.498688,80.6223872,14z/data=!3m1!4b1!4m8!4m7!1m0!1m5!1m1!1s0x3a3c15cf9816bd77:0xd47a28da4818499c!2m2!1d83.8952914!2d18.3178986?entry=ttu&g_ep=EgoyMDI2MDYwMS4wIKXMDSoASAFQAw%3D%3D"
+            target="_blank"
+            style="
+                display:inline-block;
+                background:#004080;
+                color:white;
+                padding:10px 20px;
+                text-decoration:none;
+                border-radius:5px;
+                font-weight:bold;
+            ">
+            Open Google Maps
+        </a>
+
+    </div>
+    `;
+}
+else if (district === "Vizianagaram") {
+
+        response = `
+        <div class="response">
+            <h3>Vizianagaram ACB Office</h3>
+
+            <p>Please visit the ACB Office location using Google Maps.</p>
+
+            <a href="https://google.com/maps/dir//Acb+Office,vizianagaram,+499V%2B35G,+Cloth+Market+Area,+Vizianagaram+Cantonment,+Vizianagaram,+Andhra+Pradesh+535003/@16.498688,80.6223872,14z/data=!3m1!4b1!4m8!4m7!1m0!1m5!1m1!1s0x3a3be56807e7d707:0x9670d14d674092c!2m2!1d83.3929652!2d18.1176892?entry=ttu&g_ep=EgoyMDI2MDYwMS4wIKXMDSoASAFQAw%3D%3D"
+               target="_blank"
+               style="display:inline-block;background:#004080;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;">
+               Open Google Maps
+            </a>
+        </div>
+        `;
+    }
+else if (district === "Visakhapatnam") {
+
+    response = `
+    <div class="response">
+        <h3>Visakhapatnam ACB Office</h3>
+
+        <p>Please visit the ACB Office location using Google Maps.</p>
+
+        <a href="https://www.google.com/maps/dir/16.5081388,80.6145273/ACB+office,+Q86P%2BXHQ,+Vishalakshi+Nagar,+Visakhapatnam,+Andhra+Pradesh+530040/@16.5081388,80.6145273,14z/data=!4m9!4m8!1m1!4e1!1m5!1m1!1s0x3a395b58a9303709:0xb7dc4c70b8f23b42!2m2!1d83.3364873!2d17.7624545?entry=ttu&g_ep=EgoyMDI2MDYwMS4wIKXMDSoASAFQAw%3D%3D"
+           target="_blank"
+           style="
+                display:inline-block;
+                background:#004080;
+                color:white;
+                padding:10px 20px;
+                text-decoration:none;
+                border-radius:5px;
+                font-weight:bold;
+           ">
+           Open Google Maps
+        </a>
+    </div>
+    `;
+}
+else if (district === "East Godavari") {
+
+    response = `
+    <div class="response">
+        <h3>East Godavari ACB Office</h3>
+
+        <p>Please visit the ACB Office location using Google Maps.</p>
+
+        <a href="https://www.google.com/maps/dir/16.5081388,80.6145273/Anti+Corruption+Bureau+Office,+XQXX%2BHRH,+VL+Puram,+Venkateswara+Nagar,+Rajamahendravaram,+Andhra+Pradesh+533103/@16.5081388,80.6145273,14z/data=!4m9!4m8!1m1!4e1!1m5!1m1!1s0x3a37a371fd986d3b:0x62a8a9d04bb4012!2m2!1d81.7995347!2d16.9989708?entry=ttu&g_ep=EgoyMDI2MDYwMS4wIKXMDSoASAFQAw%3D%3D"
+           target="_blank"
+           style="
+                display:inline-block;
+                background:#004080;
+                color:white;
+                padding:10px 20px;
+                text-decoration:none;
+                border-radius:5px;
+                font-weight:bold;
+           ">
+           Open Google Maps
+        </a>
+    </div>
+    `;
+}
+else if (district === "West Godavari") {
+
+    response = `
+    <div class="response">
+        <h3>West Godavari ACB Office</h3>
+
+        <p>Please visit the ACB Office location using Google Maps.</p>
+
+        <a href="https://www.google.com/maps/dir/16.5081388,80.6145273/Anti+Corruption+Bureau+Office,+27-21-44B,+Aphb+Colony,+Santhi+Nagar,+Eluru,+Andhra+Pradesh+534007/@16.5081388,80.6145273,14z/data=!3m1!4b1!4m9!4m8!1m1!4e1!1m5!1m1!1s0x3a3615dc8c83e223:0xba332988abdbbf6!2m2!1d81.0854254!2d16.7100499?entry=ttu&g_ep=EgoyMDI2MDYwMS4wIKXMDSoASAFQAw%3D%3D"
+           target="_blank"
+           style="
+                display:inline-block;
+                background:#004080;
+                color:white;
+                padding:10px 20px;
+                text-decoration:none;
+                border-radius:5px;
+                font-weight:bold;
+           ">
+           Open Google Maps
+        </a>
+    </div>
+    `;
+}
+else if (district === "Krishna") {
+
+    response = `
+    <div class="response">
+        <h3>Krishna ACB Office</h3>
+
+        <p>Please visit the ACB Office location using Google Maps.</p>
+
+        <a href="https://www.google.com/maps/dir/16.5081388,80.6145273/ACB+VIJAYAWADA+RANGE+OFFICE,+Gayatri+Nagar+Road,+Polyclinic+Rd,+Acharya+Ranga+Nagar,+Vijayawada,+Andhra+Pradesh+520010/@16.5081388,80.6145273,14z/data=!3m1!4b1!4m9!4m8!1m1!4e1!1m5!1m1!1s0x3a35fab73bce3041:0x958a7f8516a8c492!2m2!1d80.6502397!2d16.5037095?entry=ttu&g_ep=EgoyMDI2MDYwMS4wIKXMDSoASAFQAw%3D%3D"
+           target="_blank"
+           style="
+                display:inline-block;
+                background:#004080;
+                color:white;
+                padding:10px 20px;
+                text-decoration:none;
+                border-radius:5px;
+                font-weight:bold;
+           ">
+           Open Google Maps
+        </a>
+    </div>
+    `;
+}
+else if (district === "Guntur") {
+
+    response = `
+    <div class="response">
+        <h3>Guntur ACB Office</h3>
+
+        <p>Please visit the ACB Office location using Google Maps.</p>
+
+        <a href="https://www.google.com/maps/dir/16.5081388,80.6145273/ACB+OFFICE+GUNTUR,+GMCANA+Rd,+behind+Medical+College,+Kanna+Vari+Thota,+Guntur,+Andhra+Pradesh+522004/@16.5081388,80.6145273,14z/data=!3m1!4b1!4m9!4m8!1m1!4e1!1m5!1m1!1s0x3a4a75630d7e8601:0xf53ee64a7411597b!2m2!1d80.4391409!2d16.2971543?entry=ttu&g_ep=EgoyMDI2MDYwMS4wIKXMDSoASAFQAw%3D%3D"
+           target="_blank"
+           style="
+                display:inline-block;
+                background:#004080;
+                color:white;
+                padding:10px 20px;
+                text-decoration:none;
+                border-radius:5px;
+                font-weight:bold;
+           ">
+           Open Google Maps
+        </a>
+    </div>
+    `;
+}
+else if (district === "Ongole") {
+
+    response = `
+    <div class="response">
+        <h3>Ongole ACB Office</h3>
+
+        <p>Please visit the ACB Office location using Google Maps.</p>
+
+        <a href="https://www.google.com/maps/dir//Anti-Corruption+Bureau,+D.+No.21-43-271,+Bhagyanagar+4th+Lane,+11+th+Cross+Road,+RIMS+back+side,+Ongole,+Prakasam+District,+Andhra+Pradesh,+PIN+523001,+Andhr,+Andhra+Pradesh+523001/@16.4803596,79.2668123,8.53z/data=!4m8!4m7!1m0!1m5!1m1!1s0x3a4b011a6a7d0255:0x99d8d5d72cbc8f6f!2m2!1d80.043075!2d15.4903084?entry=ttu&g_ep=EgoyMDI2MDYwMS4wIKXMDSoASAFQAw%3D%3D"
+           target="_blank"
+           style="
+                display:inline-block;
+                background:#004080;
+                color:white;
+                padding:10px 20px;
+                text-decoration:none;
+                border-radius:5px;
+                font-weight:bold;
+           ">
+           Open Google Maps
+        </a>
+    </div>
+    `;
+}
+else if (district === "Nellore") {
+
+    response = `
+    <div class="response">
+        <h3>Nellore ACB Office</h3>
+
+        <p>Please visit the ACB Office location using Google Maps.</p>
+
+        <a href="https://www.google.com/maps/dir//ACB+Office,+CXR9%2BVXX,+Batwadipalem,+Nellore,+Andhra+Pradesh+524003/@16.4803596,79.2668123,8.53z/data=!3m1!4b1!4m8!4m7!1m0!1m5!1m1!1s0x3a4cf32c9b49c753:0xa9f7b0447278fb1!2m2!1d79.9699705!2d14.4422148?entry=ttu&g_ep=EgoyMDI2MDYwMS4wIKXMDSoASAFQAw%3D%3D"
+           target="_blank"
+           style="
+                display:inline-block;
+                background:#004080;
+                color:white;
+                padding:10px 20px;
+                text-decoration:none;
+                border-radius:5px;
+                font-weight:bold;
+           ">
+           Open Google Maps
+        </a>
+    </div>
+    `;
+}
+else if (district === "Kurnool") {
+
+    response = `
+    <div class="response">
+        <h3>Kurnool ACB Office</h3>
+
+        <p>Please visit the ACB Office location using Google Maps.</p>
+
+        <a href="https://www.google.com/maps/dir//ACB+OFFICE+KURNOOL,+R28V%2BCJR,+A+Camp+Rd,+A+Camp,+Kurnool,+Andhra+Pradesh+518002/@16.4803596,79.2668123,8.53z/data=!3m1!4b1!4m8!4m7!1m0!1m5!1m1!1s0x3bb5dd003f6f3a6d:0x55f77eaae181a9d8!2m2!1d78.0439994!2d15.8160674?entry=ttu&g_ep=EgoyMDI2MDYwMS4wIKXMDSoASAFQAw%3D%3D"
+           target="_blank"
+           style="
+                display:inline-block;
+                background:#004080;
+                color:white;
+                padding:10px 20px;
+                text-decoration:none;
+                border-radius:5px;
+                font-weight:bold;
+           ">
+           Open Google Maps
+        </a>
+    </div>
+    `;
+}
+else if (district === "Kadapa") {
+
+    response = `
+    <div class="response">
+        <h3>Kadapa ACB Office</h3>
+
+        <p>Please visit the ACB Office location using Google Maps.</p>
+
+        <a href="https://www.google.com/maps/dir//ACB+Office,+Kadapa,+Oyo+Pizza,+corner+Cooperative+government,+opposite+Street,+Ganagapeta,+Kadapa,+Andhra+Pradesh+516001/@16.4803596,79.2668123,8.53z/data=!3m1!4b1!4m8!4m7!1m0!1m5!1m1!1s0x3bb37100391488c9:0xddbfd0198d11d592!2m2!1d78.8298138!2d14.485453?entry=ttu&g_ep=EgoyMDI2MDYwMS4wIKXMDSoASAFQAw%3D%3D"
+           target="_blank"
+           style="
+                display:inline-block;
+                background:#004080;
+                color:white;
+                padding:10px 20px;
+                text-decoration:none;
+                border-radius:5px;
+                font-weight:bold;
+           ">
+           Open Google Maps
+        </a>
+    </div>
+    `;
+}
+else if (district === "Tirupati") {
+
+    response = `
+    <div class="response">
+        <h3>Tirupati ACB Office</h3>
+
+        <p>Please visit the ACB Office location using Google Maps.</p>
+
+        <a href="https://www.google.com/maps/dir//ACB+Office,+Tirupathi,+JC98%2BXCF,+Air+Bypass+Rd,+beside+Tehsildar+MRO+Office,+New+Balaji+Colony,+Tirupati,+Andhra+Pradesh+517502/@16.4803596,79.2668123,9z/data=!3m1!4b1!4m8!4m7!1m0!1m5!1m1!1s0x3a4d4b9faaaaaaab:0xb148b6913ef8b43d!2m2!1d79.4160521!2d13.6199683?entry=ttu&g_ep=EgoyMDI2MDYwMS4wIKXMDSoASAFQAw%3D%3D"
+           target="_blank"
+           style="
+                display:inline-block;
+                background:#004080;
+                color:white;
+                padding:10px 20px;
+                text-decoration:none;
+                border-radius:5px;
+                font-weight:bold;
+           ">
+           Open Google Maps
+        </a>
+    </div>
+    `;
+}
+else if (district === "Ananthapuram") {
+
+    response = `
+    <div class="response">
+        <h3>Ananthapuram ACB Office</h3>
+
+        <p>Please visit the ACB Office location using Google Maps.</p>
+
+        <a href="https://www.google.com/maps/dir//ACB+Office,+Anantapuramu,+MJ39%2BQM3,+ACB+OFFICE,+Lenin+Nagar,+Upparapalli,+Andhra+Pradesh+515002/@16.4803596,79.2668123,9z/data=!3m1!4b1!4m8!4m7!1m0!1m5!1m1!1s0x3bb14b07d7a68adf:0x32d0895745f15194!2m2!1d77.6190698!2d14.654346?entry=ttu&g_ep=EgoyMDI2MDYwMS4wIKXMDSoASAFQAw%3D%3D"
+           target="_blank"
+           style="
+                display:inline-block;
+                background:#004080;
+                color:white;
+                padding:10px 20px;
+                text-decoration:none;
+                border-radius:5px;
+                font-weight:bold;
+           ">
+           Open Google Maps
+        </a>
+    </div>
+    `;
+}
+
+    document.getElementById("responseArea").innerHTML = response;
+}
+
+document.getElementById("complaintForm").addEventListener(
+    "submit",
+    function(event) {
+
+        event.preventDefault();
+
+        document.getElementById("grievanceForm").style.display = "none";
+
+        document.getElementById("responseArea").innerHTML =
+        `
+        <div class="response">
+            Thank you. ACB takes care of the issue and you will
+            receive a call shortly from our end.
+        </div>
+        `;
+
+        this.reset();
+    }
+);
+// Allow only letters and spaces in Name
+document.getElementById("name").addEventListener("input", function() {
+    this.value = this.value.replace(/[^A-Za-z ]/g, "");
+});
+
+// Allow only digits in AADHAR
+document.getElementById("AADHAR").addEventListener("input", function() {
+    this.value = this.value.replace(/\D/g, "").slice(0, 12);
+});
+
+// Allow only digits in Phone Number
+document.getElementById("phone").addEventListener("input", function() {
+    this.value = this.value.replace(/\D/g, "").slice(0, 10);
+});
+
+// =======================
+// Voice Recording Section
+// =======================
+
+let mediaRecorder;
+let audioChunks = [];
+let audioBlob = null;
+
+const startBtn = document.getElementById("startRecord");
+const stopBtn = document.getElementById("stopRecord");
+const statusText = document.getElementById("recordingStatus");
+const audioPlayback = document.getElementById("audioPlayback");
+
+startBtn.addEventListener("click", async () => {
+
+    try {
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+            audio: true
+        });
+
+        mediaRecorder = new MediaRecorder(stream);
+
+        audioChunks = [];
+
+        mediaRecorder.ondataavailable = event => {
+            audioChunks.push(event.data);
+        };
+
+        mediaRecorder.onstop = () => {
+
+            audioBlob = new Blob(audioChunks, {
+                type: "audio/webm"
+            });
+
+            const audioURL = URL.createObjectURL(audioBlob);
+
+            audioPlayback.src = audioURL;
+            audioPlayback.style.display = "block";
+
+            statusText.innerHTML =
+                "✅ Voice complaint recorded successfully";
+
+            // Optional: Store Base64 string
+            const reader = new FileReader();
+
+            reader.onloadend = function() {
+                document.getElementById("voiceData").value =
+                    reader.result;
+            };
+
+            reader.readAsDataURL(audioBlob);
+        };
+
+        mediaRecorder.start();
+
+        statusText.innerHTML =
+            "🔴 Recording in progress...";
+
+        statusText.classList.add("recording");
+
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+
+    } catch(error) {
+
+        alert(
+            "Microphone access denied or unavailable."
+        );
+
+        console.error(error);
+    }
+});
+
+stopBtn.addEventListener("click", () => {
+
+    mediaRecorder.stop();
+
+    startBtn.disabled = false;
+    stopBtn.disabled = true;
+
+    statusText.classList.remove("recording");
+}); 
+
+</script>
+
+</body>
+</html>
