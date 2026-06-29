@@ -118,7 +118,7 @@ def load_models():
         import whisperx
         print("Loading WhisperX model (faster-whisper)...")
         device = "cuda" if torch.cuda.is_available() else "cpu"
-        whisperx_model = whisperx.load_model("small", device, compute_type="float16" if device == "cuda" else "int8")
+        whisperx_model = whisperx.load_model("Systran/faster-whisper-medium", device, compute_type="float16" if device == "cuda" else "int8")
         print("WhisperX loaded!")
     except Exception as e:
         print(f"Error loading WhisperX: {e}")

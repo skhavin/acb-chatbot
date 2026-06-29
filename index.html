@@ -275,22 +275,10 @@ h3 {
             <label for="languageSelector" style="font-weight: bold; margin-right: 10px;">Preferred Language:</label>
             <select id="languageSelector" onchange="updateLanguage()">
                 <option value="en">English</option>
-                <option value="hi">हिंदी (Hindi)</option>
+                <option value="hi">हिंదీ (Hindi)</option>
                 <option value="te">తెలుగు (Telugu)</option>
                 <option value="ta">தமிழ் (Tamil)</option>
-                <option value="kn">ಕನ್ನಡ (Kannada)</option>
-                <option value="ml">മലയാളം (Malayalam)</option>
-                <option value="bn">বাংলা (Bengali)</option>
-                <option value="gu">ગુજરાતી (Gujarati)</option>
-                <option value="mr">मराठी (Marathi)</option>
-                <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
-                <option value="ur">اردو (Urdu)</option>
             </select>
-        </div>
-        <div class="voice-assist-controls">
-            <button class="mic-btn" id="iterativeMicBtn" type="button" onclick="toggleIterativeVoice()">🎤</button>
-            <div class="voice-progress" id="voiceProgress">Click mic to start voice assistance</div>
-            <button class="option-btn" style="width:auto; padding:8px 16px;" onclick="resetVoiceProgress()">Reset</button>
         </div>
 
         <form id="complaintForm">
@@ -389,11 +377,20 @@ h3 {
 
 <div class="form-field" data-field="issueDetail">
     <label><b>Brief the issue in detail</b></label>
-    <textarea
-        id="issueDetail"
-        placeholder="Type the issue details here..."
-        rows="4"
-    ></textarea>
+    <div style="display: flex; gap: 10px; align-items: flex-start;">
+        <textarea
+            id="issueDetail"
+            placeholder="Type the issue details here..."
+            rows="4"
+            style="flex: 1;"
+        ></textarea>
+        <button
+            type="button"
+            id="issueMicBtn"
+            class="mic-btn"
+            style="width: 50px; height: 50px; border-radius: 50%; border: none; cursor: pointer; font-size: 22px; background: #ff6b6b; color: white;"
+        >🎤</button>
+    </div>
 </div>
 
 <br><br>
